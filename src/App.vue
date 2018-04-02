@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="header">
-      <a href="/" @click.stop.prevent="$router.push({ path: '/' })">NOT FIND</a>
+      <a href="/" @click.stop.prevent="$router.push({ path: '/' })">NOT FIND YOU</a>
     </div>
     <p class="links">
       <a href="https://github.com/notfind" target="_blank" rel="noopener noreferrer nofollow">

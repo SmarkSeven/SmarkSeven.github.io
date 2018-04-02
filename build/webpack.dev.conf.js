@@ -9,6 +9,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const siteConfig = require('../src/siteConfig.js')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
@@ -55,7 +56,13 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      inject: true
+      inject: true,
+      // custome Options
+      title: siteConfig.blogTitle,
+      description: siteConfig.blogDescription,
+      author: siteConfig.blogAuthor,
+      keywords: siteConfig.blogKeywords,
+      // favicon: siteConfig.favicon
     }),
     // copy custom static assets
     new CopyWebpackPlugin([

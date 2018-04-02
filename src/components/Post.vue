@@ -1,5 +1,6 @@
 <template>
-  <div class="post">
+  <div id="post_container">
+    <div class="post">
     <h3 class="date">{{date | DateFormatEN}}</h3>
     <h1>{{title}}</h1>
     <div class="content"
@@ -8,6 +9,8 @@
     <a v-if="hasNewer" href="/" id="newer" class="blog-nav" @click.stop.prevent="push(newerPost)"><&nbsp;NEWER</a>
     <a v-if="hasOlder" href="/" id="older" class="blog-nav" @click.stop.prevent="push(olderPost)">OLDER&nbsp;></a>
   </div>
+  <div id="container"></div>
+  </div>
 </template>
 
 <script>
@@ -15,6 +18,7 @@ import { mapState, mapMutations, mapGetters } from "vuex";
 import fm from "front-matter";
 import API from "../API";
 import marked from "../utils/render.js";
+import gitmentConfig from "../../gitmentConfig"
 
 export default {
   data() {
@@ -32,6 +36,18 @@ export default {
     ...mapMutations(["setPostContent", "setCurrentPostIndexBySha"]),
     push(post) {
       this.$router.replace({ path: `/${post.date}/${post.title}/${post.sha}` });
+    },
+    gitmentRender() {
+      const gitment = new Gitment({
+        id: this.title,
+        owner: gitmentConfig.owner,
+        repo: gitmentConfig.repo,
+        oauth: {
+          client_id: gitmentConfig.client_id,
+          client_secret: gitmentConfig.client_secret
+        }
+      });
+      gitment.render("container");
     }
   },
   watch: {
@@ -40,6 +56,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+    window.document.title = `${to.params.title}`;
     API.getDetail(to.params.sha)
       .then(text => {
         return marked(fm(text).body);
@@ -51,6 +68,7 @@ export default {
           vm.title = to.params.title;
           vm.date = to.params.date;
           vm.sha = to.params.sha;
+          vm.gitmentRender();
         });
       })
       .catch(err => {
@@ -58,6 +76,7 @@ export default {
       });
   },
   beforeRouteUpdate(to, from, next) {
+    window.document.title = `${to.params.title}`;
     API.getDetail(to.params.sha)
       .then(text => {
         this.setPostContent(marked(fm(text).body));
@@ -65,6 +84,7 @@ export default {
         this.title = to.params.title;
         this.date = to.params.date;
         this.sha = to.params.sha;
+        this.gitmentRender();
         next();
       })
       .catch(err => {
